@@ -89,11 +89,12 @@ class TransactionProducer
         $this->preparedMessages[] = $message;
         return $messageId;
     }
-    
+
     /**
      * 提交事务
-     * 
+     *
      * @return void
+     * @throws \Exception
      */
     public function commit()
     {

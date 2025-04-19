@@ -2,7 +2,9 @@
 
 namespace hollisho\MQTransaction\Compensation;
 
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
@@ -70,12 +72,14 @@ class CompensationHandler
         $this->consumerHandlers[$topic] = $handler;
         return $this;
     }
-    
+
     /**
      * 处理生产者失败
-     * 
+     *
      * @param array $message 失败的消息
      * @return bool 处理结果
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function handleProducerFailure(array $message): bool
     {
@@ -97,12 +101,14 @@ class CompensationHandler
             return false;
         }
     }
-    
+
     /**
      * 处理消费者失败
-     * 
+     *
      * @param array $consumption 失败的消费记录
      * @return bool 处理结果
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function handleConsumerFailure(array $consumption): bool
     {
@@ -124,12 +130,13 @@ class CompensationHandler
             return false;
         }
     }
-    
+
     /**
      * 解析处理器
-     * 
      * @param callable|string $handler 处理器函数或服务ID
      * @return callable 可调用的处理器
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     private function resolveHandler($handler): callable
     {

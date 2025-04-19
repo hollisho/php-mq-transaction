@@ -5,6 +5,8 @@ namespace hollisho\MQTransaction\Consumer;
 use hollisho\MQTransaction\Compensation\CompensationHandler;
 use hollisho\MQTransaction\Database\IdempotencyHelper;
 use hollisho\MQTransaction\Database\TransactionHelper;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
@@ -71,11 +73,13 @@ class CompensationTrigger
         $this->batchSize = $batchSize;
         return $this;
     }
-    
+
     /**
      * 检查并触发生产者端补偿
-     * 
+     *
      * @return int 处理的消息数量
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function checkProducerCompensation(): int
     {
@@ -112,11 +116,13 @@ class CompensationTrigger
         
         return $processedCount;
     }
-    
+
     /**
      * 检查并触发消费者端补偿
-     * 
+     *
      * @return int 处理的消息数量
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function checkConsumerCompensation(): int
     {
@@ -152,13 +158,15 @@ class CompensationTrigger
         
         return $processedCount;
     }
-    
+
     /**
      * 运行补偿检查
-     * 
+     *
      * @param int $interval 检查间隔（秒）
      * @param int|null $maxIterations 最大迭代次数（用于测试，生产环境应为null）
      * @return void
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function run(int $interval = 60, int $maxIterations = null)
     {
