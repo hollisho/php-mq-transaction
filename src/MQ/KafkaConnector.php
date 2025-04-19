@@ -43,7 +43,7 @@ class KafkaConnector implements MQConnectorInterface
      * @param array $config Kafka连接配置
      * @param LoggerInterface|null $logger 日志记录器
      */
-    public function __construct(array $config, ?LoggerInterface $logger = null)
+    public function __construct(array $config, LoggerInterface $logger = null)
     {
         $this->config = array_merge([
             'brokers' => 'localhost:9092',
@@ -205,7 +205,7 @@ class KafkaConnector implements MQConnectorInterface
      * @param callable $callback 消息处理回调函数
      * @return void
      */
-    public function consume(array $topics, callable $callback): void
+    public function consume(array $topics, callable $callback)
     {
         try {
             $consumer = $this->getConsumer();
@@ -337,7 +337,7 @@ class KafkaConnector implements MQConnectorInterface
      * 
      * @return void
      */
-    public function close(): void
+    public function close()
     {
         if ($this->consumer) {
             $this->consumer->close();

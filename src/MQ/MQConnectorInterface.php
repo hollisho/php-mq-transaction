@@ -27,7 +27,7 @@ interface MQConnectorInterface
      * @param callable $callback 消息处理回调函数
      * @return void
      */
-    public function consume(array $topics, callable $callback): void;
+    public function consume(array $topics, callable $callback);
     
     /**
      * 确认消息已处理
@@ -51,5 +51,5 @@ interface MQConnectorInterface
      * 
      * @return void
      */
-    public function close(): void;
+    public function close();
 }

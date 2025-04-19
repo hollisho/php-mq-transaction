@@ -49,7 +49,7 @@ class MessageDispatcher
     public function __construct(
         MQConnectorInterface $mqConnector, 
         TransactionHelper $transactionHelper,
-        ?LoggerInterface $logger = null
+        LoggerInterface $logger = null
     ) {
         $this->mqConnector = $mqConnector;
         $this->transactionHelper = $transactionHelper;
@@ -145,7 +145,7 @@ class MessageDispatcher
      * @param int|null $maxIterations 最大迭代次数（用于测试，生产环境应为null）
      * @return void
      */
-    public function run(int $interval = 5, ?int $maxIterations = null): void
+    public function run(int $interval = 5, int $maxIterations = null)
     {
         $iterations = 0;
         

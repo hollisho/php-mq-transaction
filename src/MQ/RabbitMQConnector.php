@@ -50,7 +50,7 @@ class RabbitMQConnector implements MQConnectorInterface
      * @param array $config RabbitMQ连接配置
      * @param LoggerInterface|null $logger 日志记录器
      */
-    public function __construct(array $config, ?LoggerInterface $logger = null)
+    public function __construct(array $config, LoggerInterface $logger = null)
     {
         $this->config = array_merge([
             'host' => 'localhost',
@@ -269,7 +269,7 @@ class RabbitMQConnector implements MQConnectorInterface
      * @param callable $callback 消息处理回调函数
      * @return void
      */
-    public function consume(array $topics, callable $callback): void
+    public function consume(array $topics, callable $callback)
     {
         try {
             $channel = $this->getChannel();
@@ -400,7 +400,7 @@ class RabbitMQConnector implements MQConnectorInterface
      * 
      * @return void
      */
-    public function close(): void
+    public function close()
     {
         if ($this->channel) {
             $this->channel->close();

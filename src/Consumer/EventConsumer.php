@@ -44,7 +44,7 @@ class EventConsumer
     public function __construct(
         MQConnectorInterface $mqConnector, 
         IdempotencyHelper $idempotencyHelper,
-        ?LoggerInterface $logger = null
+        LoggerInterface $logger = null
     ) {
         $this->mqConnector = $mqConnector;
         $this->idempotencyHelper = $idempotencyHelper;
@@ -129,7 +129,7 @@ class EventConsumer
      * @param array $topics 要消费的主题列表
      * @return void
      */
-    public function start(array $topics = []): void
+    public function start(array $topics = [])
     {
         // 如果未指定主题，则使用所有已注册处理器的主题
         if (empty($topics)) {

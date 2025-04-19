@@ -52,7 +52,7 @@ class CompensationTrigger
         TransactionHelper $transactionHelper,
         IdempotencyHelper $idempotencyHelper,
         CompensationHandler $compensationHandler,
-        ?LoggerInterface $logger = null
+        LoggerInterface $logger = null
     ) {
         $this->transactionHelper = $transactionHelper;
         $this->idempotencyHelper = $idempotencyHelper;
@@ -160,7 +160,7 @@ class CompensationTrigger
      * @param int|null $maxIterations 最大迭代次数（用于测试，生产环境应为null）
      * @return void
      */
-    public function run(int $interval = 60, ?int $maxIterations = null): void
+    public function run(int $interval = 60, int $maxIterations = null)
     {
         $iterations = 0;
         

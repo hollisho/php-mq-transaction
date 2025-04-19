@@ -39,7 +39,7 @@ class CompensationHandler
      * @param ContainerInterface|null $container 服务容器
      * @param LoggerInterface|null $logger 日志记录器
      */
-    public function __construct(?ContainerInterface $container = null, ?LoggerInterface $logger = null)
+    public function __construct(ContainerInterface $container = null, LoggerInterface $logger = null)
     {
         $this->container = $container;
         $this->logger = $logger ?? new NullLogger();

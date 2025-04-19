@@ -50,7 +50,7 @@ class TransactionProducer
      * 
      * @return void
      */
-    public function beginTransaction(): void
+    public function beginTransaction()
     {
         if ($this->inTransaction) {
             throw new \RuntimeException('Transaction already started');
@@ -95,7 +95,7 @@ class TransactionProducer
      * 
      * @return void
      */
-    public function commit(): void
+    public function commit()
     {
         if (!$this->inTransaction) {
             throw new \RuntimeException('No active transaction');
@@ -124,7 +124,7 @@ class TransactionProducer
      * 
      * @return void
      */
-    public function rollback(): void
+    public function rollback()
     {
         if (!$this->inTransaction) {
             return;
