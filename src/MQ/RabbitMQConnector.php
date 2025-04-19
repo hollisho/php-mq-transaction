@@ -53,10 +53,10 @@ class RabbitMQConnector implements MQConnectorInterface
     public function __construct(array $config, LoggerInterface $logger = null)
     {
         $this->config = array_merge([
-            'host' => 'localhost',
+            'host' => 'rabbitmq',
             'port' => 5672,
-            'user' => 'guest',
-            'password' => 'guest',
+            'user' => 'myuser',
+            'password' => 'mypass',
             'vhost' => '/',
         ], $config);
         

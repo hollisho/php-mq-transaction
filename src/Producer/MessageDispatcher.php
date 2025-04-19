@@ -92,24 +92,63 @@ class MessageDispatcher
         
         foreach ($pendingMessages as $message) {
             try {
+                // 确保数据是数组格式
+                $data = is_string($message['data']) ? json_decode($message['data'], true) : $message['data'];
+                $options = [];
+                
+                // 处理options字段
+                if (!empty($message['options'])) {
+                    $options = is_string($message['options']) ? json_decode($message['options'], true) : $message['options'];
+                }
+                
                 // 发送消息到MQ
-                $this->mqConnector->send(
+                $result = $this->mqConnector->send(
                     $message['topic'],
-                    $message['data'],
+                    $data,
                     $message['message_id'],
-                    $message['options'] ?? []
+                    $options
                 );
                 
-                // 更新消息状态为已发送
-                $this->transactionHelper->markMessageAsSent($message['message_id']);
-                $sentCount++;
-                
-                $this->logger->info('Message sent successfully', [
-                    'message_id' => $message['message_id'],
-                    'topic' => $message['topic']
-                ]);
+                // 仅当发送成功时才更新状态并计数
+                if ($result) {
+                    // 更新消息状态为已发送
+                    $this->transactionHelper->markMessageAsSent($message['message_id']);
+                    $sentCount++;
+                    
+                    $this->logger->info('Message sent successfully', [
+                        'message_id' => $message['message_id'],
+                        'topic' => $message['topic']
+                    ]);
+                } else {
+                    // 发送失败的处理逻辑
+                    $this->logger->warning('Failed to send message', [
+                        'message_id' => $message['message_id'],
+                        'topic' => $message['topic'],
+                        'retry_count' => $message['retry_count']
+                    ]);
+                    
+                    // 更新重试次数
+                    $retryCount = $message['retry_count'] + 1;
+                    
+                    if ($retryCount >= $this->maxRetryCount) {
+                        // 超过最大重试次数，标记为失败
+                        $this->transactionHelper->markMessageAsFailed(
+                            $message['message_id'],
+                            'Max retry count exceeded'
+                        );
+                        
+                        $this->logger->error('Max retry count exceeded for message', [
+                            'message_id' => $message['message_id'],
+                            'topic' => $message['topic'],
+                            'retry_count' => $retryCount
+                        ]);
+                    } else {
+                        // 更新重试次数
+                        $this->transactionHelper->incrementRetryCount($message['message_id']);
+                    }
+                }
             } catch (\Exception $e) {
-                $this->logger->error('Failed to send message', [
+                $this->logger->error('Exception during message dispatch', [
                     'message_id' => $message['message_id'],
                     'topic' => $message['topic'],
                     'error' => $e->getMessage(),
@@ -117,21 +156,7 @@ class MessageDispatcher
                 ]);
                 
                 // 更新重试次数
-                $retryCount = $message['retry_count'] + 1;
-                
-                if ($retryCount >= $this->maxRetryCount) {
-                    // 超过最大重试次数，标记为失败
-                    $this->transactionHelper->markMessageAsFailed(
-                        $message['message_id'],
-                        $e->getMessage()
-                    );
-                } else {
-                    // 更新重试次数
-                    $this->transactionHelper->incrementMessageRetryCount(
-                        $message['message_id'],
-                        $retryCount
-                    );
-                }
+                $this->transactionHelper->incrementRetryCount($message['message_id']);
             }
         }
         

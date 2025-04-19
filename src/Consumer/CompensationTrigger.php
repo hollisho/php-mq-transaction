@@ -103,7 +103,7 @@ class CompensationTrigger
                     ]);
                 }
             } catch (\Exception $e) {
-                $this->logger->error('Exception during producer compensation', [
+                $this->logger->error('Error during producer compensation', [
                     'message_id' => $message['message_id'],
                     'error' => $e->getMessage()
                 ]);
@@ -133,8 +133,8 @@ class CompensationTrigger
                 $result = $this->compensationHandler->handleConsumerFailure($consumption);
                 
                 if ($result) {
-                    // 标记为已补偿
-                    $this->idempotencyHelper->markAsCompensated($consumption['message_id']);
+                    // 标记为已处理
+                    $this->idempotencyHelper->markAsProcessed($consumption['message_id']);
                     $processedCount++;
                 } else {
                     // 补偿失败，记录日志
@@ -143,7 +143,7 @@ class CompensationTrigger
                     ]);
                 }
             } catch (\Exception $e) {
-                $this->logger->error('Exception during consumer compensation', [
+                $this->logger->error('Error during consumer compensation', [
                     'message_id' => $consumption['message_id'],
                     'error' => $e->getMessage()
                 ]);

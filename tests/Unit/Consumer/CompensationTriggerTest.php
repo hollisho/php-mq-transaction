@@ -103,7 +103,7 @@ class CompensationTriggerTest extends TestCase
             ->with('Triggering producer compensation', $this->anything());
         
         $this->logger->expects($this->once())
-            ->method('warning')
+            ->method('error')
             ->with('Producer compensation failed', $this->anything());
         
         // 设置预期的handleProducerFailure调用
@@ -220,7 +220,7 @@ class CompensationTriggerTest extends TestCase
             ->with('Triggering consumer compensation', $this->anything());
         
         $this->logger->expects($this->once())
-            ->method('warning')
+            ->method('error')
             ->with('Consumer compensation failed', $this->anything());
         
         // 设置预期的handleConsumerFailure调用

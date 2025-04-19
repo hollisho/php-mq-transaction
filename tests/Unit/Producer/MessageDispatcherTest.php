@@ -52,15 +52,15 @@ class MessageDispatcherTest extends TestCase
             [
                 'message_id' => 'test-message-id-1',
                 'topic' => 'test-topic-1',
-                'data' => json_encode(['key1' => 'value1']),
-                'options' => json_encode(['option1' => 'value1']),
+                'data' => ['key1' => 'value1'],
+                'options' => ['option1' => 'value1'],
                 'retry_count' => 0
             ],
             [
                 'message_id' => 'test-message-id-2',
                 'topic' => 'test-topic-2',
-                'data' => json_encode(['key2' => 'value2']),
-                'options' => json_encode(['option2' => 'value2']),
+                'data' => ['key2' => 'value2'],
+                'options' => ['option2' => 'value2'],
                 'retry_count' => 1
             ]
         ];
@@ -103,8 +103,8 @@ class MessageDispatcherTest extends TestCase
             [
                 'message_id' => 'test-message-id-1',
                 'topic' => 'test-topic-1',
-                'data' => json_encode(['key1' => 'value1']),
-                'options' => json_encode(['option1' => 'value1']),
+                'data' => ['key1' => 'value1'],
+                'options' => ['option1' => 'value1'],
                 'retry_count' => 0
             ]
         ];
@@ -144,8 +144,8 @@ class MessageDispatcherTest extends TestCase
             [
                 'message_id' => 'test-message-id-1',
                 'topic' => 'test-topic-1',
-                'data' => json_encode(['key1' => 'value1']),
-                'options' => json_encode(['option1' => 'value1']),
+                'data' => ['key1' => 'value1'],
+                'options' => ['option1' => 'value1'],
                 'retry_count' => 5 // 默认最大重试次数为5
             ]
         ];
@@ -185,8 +185,8 @@ class MessageDispatcherTest extends TestCase
             [
                 'message_id' => 'test-message-id-1',
                 'topic' => 'test-topic-1',
-                'data' => json_encode(['key1' => 'value1']),
-                'options' => json_encode(['option1' => 'value1']),
+                'data' => ['key1' => 'value1'],
+                'options' => ['option1' => 'value1'],
                 'retry_count' => 0
             ]
         ];

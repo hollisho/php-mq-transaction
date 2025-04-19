@@ -102,20 +102,11 @@ class TransactionHelper
             ORDER BY created_at ASC 
             LIMIT :limit");
         
-        $stmt->bindValue(':limit', $limit, \PDO::PARAM_INT);
-        $stmt->execute();
+        $stmt->execute(['limit' => $limit]);
         
         $messages = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         
-        // 解析JSON数据
-        foreach ($messages as &$message) {
-            if (isset($message['data']) && is_string($message['data'])) {
-                $message['data'] = json_decode($message['data'], true);
-            }
-            if (isset($message['options']) && is_string($message['options'])) {
-                $message['options'] = json_decode($message['options'], true);
-            }
-        }
+
         
         return $messages;
     }
@@ -133,20 +124,11 @@ class TransactionHelper
             ORDER BY updated_at ASC 
             LIMIT :limit");
         
-        $stmt->bindValue(':limit', $limit, \PDO::PARAM_INT);
-        $stmt->execute();
+        $stmt->execute(['limit' => $limit]);
         
         $messages = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         
-        // 解析JSON数据
-        foreach ($messages as &$message) {
-            if (isset($message['data']) && is_string($message['data'])) {
-                $message['data'] = json_decode($message['data'], true);
-            }
-            if (isset($message['options']) && is_string($message['options'])) {
-                $message['options'] = json_decode($message['options'], true);
-            }
-        }
+
         
         return $messages;
     }
@@ -159,9 +141,8 @@ class TransactionHelper
      */
     public function markMessageAsSent(string $messageId): bool
     {
-        $stmt = $this->pdo->prepare("UPDATE {$this->tableName} 
-            SET status = 'sent', updated_at = :updated_at 
-            WHERE message_id = :message_id");
+        $stmt = $this->pdo->prepare("update {$this->tableName} set status = 'sent', updated_at = :updated_at 
+            where message_id = :message_id");
         
         return $stmt->execute([
             'message_id' => $messageId,
@@ -178,9 +159,9 @@ class TransactionHelper
      */
     public function markMessageAsFailed(string $messageId, string $error): bool
     {
-        $stmt = $this->pdo->prepare("UPDATE {$this->tableName} 
-            SET status = 'failed', error = :error, updated_at = :updated_at 
-            WHERE message_id = :message_id");
+        $stmt = $this->pdo->prepare("update {$this->tableName} 
+            set status = 'failed', error = :error, updated_at = :updated_at 
+            where message_id = :message_id");
         
         return $stmt->execute([
             'message_id' => $messageId,
@@ -197,9 +178,9 @@ class TransactionHelper
      */
     public function markMessageAsCompensated(string $messageId): bool
     {
-        $stmt = $this->pdo->prepare("UPDATE {$this->tableName} 
-            SET status = 'compensated', updated_at = :updated_at 
-            WHERE message_id = :message_id");
+        $stmt = $this->pdo->prepare("update {$this->tableName} 
+            set status = 'compensated', updated_at = :updated_at 
+            where message_id = :message_id");
         
         return $stmt->execute([
             'message_id' => $messageId,
@@ -228,6 +209,24 @@ class TransactionHelper
     }
     
     /**
+     * 增加消息重试次数（递增1）
+     * 
+     * @param string $messageId 消息ID
+     * @return bool 操作结果
+     */
+    public function incrementRetryCount(string $messageId): bool
+    {
+        $stmt = $this->pdo->prepare("update {$this->tableName} 
+            set retry_count = retry_count + 1, updated_at = :updated_at 
+            where message_id = :message_id");
+        
+        return $stmt->execute([
+            'message_id' => $messageId,
+            'updated_at' => date('Y-m-d H:i:s')
+        ]);
+    }
+    
+    /**
      * 创建消息表
      * 
      * @return bool 操作结果
@@ -249,5 +248,20 @@ class TransactionHelper
         )";
         
         return $this->pdo->exec($sql) !== false;
+    }
+    
+    /**
+     * 删除消息
+     * 
+     * @param string $messageId 消息ID
+     * @return bool 操作结果
+     */
+    public function deleteMessage(string $messageId): bool
+    {
+        $stmt = $this->pdo->prepare("DELETE FROM {$this->tableName} WHERE message_id = :message_id");
+        
+        return $stmt->execute([
+            'message_id' => $messageId
+        ]);
     }
 }

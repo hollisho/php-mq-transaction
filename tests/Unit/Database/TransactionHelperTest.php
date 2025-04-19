@@ -215,7 +215,9 @@ class TransactionHelperTest extends TestCase
 
         $this->pdo->expects($this->once())
             ->method('prepare')
-            ->with($this->stringContains("UPDATE {$this->tableName} SET status = 'failed'"))
+            ->with($this->stringContains("update {$this->tableName} 
+            set status = 'failed', error = :error, updated_at = :updated_at 
+            where message_id = :message_id"))
             ->willReturn($stmt);
 
         $stmt->expects($this->once())
@@ -239,7 +241,9 @@ class TransactionHelperTest extends TestCase
 
         $this->pdo->expects($this->once())
             ->method('prepare')
-            ->with($this->stringContains("UPDATE {$this->tableName} SET status = 'compensated'"))
+            ->with($this->stringContains("update {$this->tableName} 
+            set status = 'compensated', updated_at = :updated_at 
+            where message_id = :message_id"))
             ->willReturn($stmt);
 
         $stmt->expects($this->once())
@@ -262,7 +266,9 @@ class TransactionHelperTest extends TestCase
 
         $this->pdo->expects($this->once())
             ->method('prepare')
-            ->with($this->stringContains("UPDATE {$this->tableName} SET retry_count = retry_count + 1"))
+            ->with($this->stringContains("update {$this->tableName} 
+            set retry_count = retry_count + 1, updated_at = :updated_at 
+            where message_id = :message_id"))
             ->willReturn($stmt);
 
         $stmt->expects($this->once())

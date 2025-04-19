@@ -104,7 +104,10 @@ class TransactionProducer
         try {
             // 保存预备消息到消息表
             foreach ($this->preparedMessages as $message) {
-                $this->transactionHelper->saveMessage($message);
+                $result = $this->transactionHelper->saveMessage($message);
+                if (!$result) {
+                    throw new \RuntimeException('Failed to save message');
+                }
             }
             
             // 提交数据库事务
@@ -127,7 +130,7 @@ class TransactionProducer
     public function rollback()
     {
         if (!$this->inTransaction) {
-            return;
+            throw new \RuntimeException('No active transaction');
         }
         
         $this->transactionHelper->rollback();

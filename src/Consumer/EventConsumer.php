@@ -98,12 +98,12 @@ class EventConsumer
             
             // 调用处理器
             $handler = $this->handlers[$topic];
-            $result = $handler($message);
+            $result = $handler($message['data'] ?? []);
             
             if ($result) {
                 // 标记消息为已处理
                 $this->idempotencyHelper->markAsProcessed($messageId);
-                $this->logger->info('Message processed successfully', ['message_id' => $messageId]);
+                $this->logger->info('Message processed successfully', ['message_id' => $messageId, 'topic' => $topic]);
                 return true;
             } else {
                 // 处理失败
@@ -119,6 +119,7 @@ class EventConsumer
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
+
             return false;
         }
     }
@@ -129,7 +130,7 @@ class EventConsumer
      * @param array $topics 要消费的主题列表
      * @return void
      */
-    public function start(array $topics = [])
+    public function startConsuming(array $topics = [])
     {
         // 如果未指定主题，则使用所有已注册处理器的主题
         if (empty($topics)) {

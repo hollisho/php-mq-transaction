@@ -179,4 +179,18 @@ class IdempotencyHelper
         
         return $this->pdo->exec($sql) !== false;
     }
+    
+    /**
+     * 删除消息记录
+     * 
+     * @param string $messageId 消息ID
+     * @return bool 操作结果
+     */
+    public function deleteRecord(string $messageId): bool
+    {
+        $stmt = $this->pdo->prepare("DELETE FROM {$this->tableName} WHERE message_id = :message_id");
+        return $stmt->execute([
+            'message_id' => $messageId
+        ]);
+    }
 }
