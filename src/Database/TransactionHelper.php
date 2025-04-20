@@ -20,49 +20,123 @@ class TransactionHelper
     private $tableName;
     
     /**
+     * @var int 事务嵌套计数器
+     */
+    private $transactionCounter = 0;
+    
+    /**
+     * @var bool 是否启用调试信息
+     */
+    private $debugMode = false;
+    
+    /**
      * 构造函数
      * 
      * @param \PDO $pdo 数据库连接
      * @param string $tableName 消息表名
+     * @param bool $debug 是否启用调试
      */
-    public function __construct(\PDO $pdo, string $tableName = 'mq_messages')
+    public function __construct(\PDO $pdo, string $tableName = 'mq_messages', bool $debug = false)
     {
         $this->pdo = $pdo;
         $this->tableName = $tableName;
+        $this->debugMode = $debug;
     }
     
     /**
-     * 开始事务
+     * 开始事务，支持嵌套
      * 
      * @return bool 操作结果
      */
     public function beginTransaction(): bool
     {
-        return $this->pdo->beginTransaction();
+        // 如果是第一层事务，真正开始事务
+        if ($this->transactionCounter == 0) {
+            $this->transactionCounter++;
+            return $this->pdo->beginTransaction();
+        }
+        
+        // 如果已经在事务中，只增加计数器
+        $this->transactionCounter++;
+        return true;
     }
     
     /**
-     * 提交事务
+     * 提交事务，支持嵌套
      * 
      * @return bool 操作结果
      */
     public function commit(): bool
     {
-        return $this->pdo->commit();
+        // 确保在事务中
+        if ($this->transactionCounter == 0) {
+            // 如果没有活跃事务，记录问题但不抛出异常
+            if ($this->debugMode) {
+                error_log("Warning: Trying to commit when no active transaction exists");
+            }
+            return false;
+        }
+        
+        // 减少计数器
+        $this->transactionCounter--;
+        
+        // 如果是最外层事务，真正提交
+        if ($this->transactionCounter == 0) {
+            // 检查PDO是否认为有事务在进行
+            if ($this->pdo->inTransaction()) {
+                return $this->pdo->commit();
+            } else {
+                // PDO认为没有事务，可能是由于内部回滚或其他原因
+                if ($this->debugMode) {
+                    error_log("Warning: PDO reports no active transaction, but counter was positive");
+                }
+                // 重置计数器以保持一致性
+                $this->transactionCounter = 0;
+                return false;
+            }
+        }
+        
+        // 内层事务不做真正提交
+        return true;
     }
     
     /**
-     * 回滚事务
+     * 回滚事务，支持嵌套
      * 
      * @return bool 操作结果
      */
     public function rollback(): bool
     {
-        if ($this->pdo->inTransaction()) {
-            return $this->pdo->rollBack();
+        // 确保在事务中
+        if ($this->transactionCounter == 0) {
+            if ($this->debugMode) {
+                error_log("Warning: Trying to rollback when no active transaction exists");
+            }
+            return false; // 没有事务，不需要回滚
         }
         
-        return true;
+        // 重置计数器
+        $previousCounter = $this->transactionCounter;
+        $this->transactionCounter = 0;
+        
+        // 执行真正的回滚
+        if ($this->pdo->inTransaction()) {
+            try {
+                return $this->pdo->rollBack();
+            } catch (\PDOException $e) {
+                // 某些PDO驱动在没有活跃事务时调用rollBack会抛出异常
+                if ($this->debugMode) {
+                    error_log("Warning: Exception during rollback: " . $e->getMessage());
+                }
+                return false;
+            }
+        } else {
+            // PDO认为没有事务进行中，但我们的计数器是正数
+            if ($this->debugMode && $previousCounter > 0) {
+                error_log("Warning: PDO reports no active transaction, but counter was {$previousCounter}");
+            }
+            return false;
+        }
     }
     
     /**

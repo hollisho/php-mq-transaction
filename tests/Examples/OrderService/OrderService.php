@@ -1,6 +1,6 @@
 <?php
 
-namespace hollisho\MQTransaction\Examples\OrderService;
+namespace hollisho\MQTransactionTests\Examples\OrderService;
 
 use hollisho\MQTransaction\Producer\TransactionProducer;
 
