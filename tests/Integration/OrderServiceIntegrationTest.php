@@ -337,23 +337,23 @@ class OrderServiceIntegrationTest extends TestCase
             $this->logger->error("消息分发失败", ['error' => $e->getMessage()]);
         }
         
-        try {
-            // 检查并设置自动提交
-            $this->pdo->exec("SET autocommit=1");
-            $this->pdo->setAttribute(\PDO::ATTR_AUTOCOMMIT, true);
-            $autoCommit = $this->pdo->query("SELECT @@autocommit")->fetchColumn();
-            $this->logger->info("自动提交设置为开启", ['autocommit' => $autoCommit]);
-            
-            // 清理测试数据
-            $this->logger->info("清理测试数据");
-            $this->pdo->exec("DELETE FROM order_items");
-            $this->pdo->exec("DELETE FROM order_payments");
-            $this->pdo->exec("DELETE FROM orders");
-            $this->pdo->exec("DELETE FROM mq_messages");
-        } catch (\Exception $e) {
-            $this->logger->error("清理测试数据失败", ['error' => $e->getMessage()]);
-        }
-        
+//        try {
+//            // 检查并设置自动提交
+//            $this->pdo->exec("SET autocommit=1");
+//            $this->pdo->setAttribute(\PDO::ATTR_AUTOCOMMIT, true);
+//            $autoCommit = $this->pdo->query("SELECT @@autocommit")->fetchColumn();
+//            $this->logger->info("自动提交设置为开启", ['autocommit' => $autoCommit]);
+//
+//            // 清理测试数据
+//            $this->logger->info("清理测试数据");
+//            $this->pdo->exec("DELETE FROM order_items");
+//            $this->pdo->exec("DELETE FROM order_payments");
+//            $this->pdo->exec("DELETE FROM orders");
+//            $this->pdo->exec("DELETE FROM mq_messages");
+//        } catch (\Exception $e) {
+//            $this->logger->error("清理测试数据失败", ['error' => $e->getMessage()]);
+//        }
+//
         try {
             // 关闭连接
             $this->logger->info("关闭连接");
