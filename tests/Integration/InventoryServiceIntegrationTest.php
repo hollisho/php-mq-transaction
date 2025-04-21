@@ -595,8 +595,8 @@ class InventoryServiceIntegrationTest extends TestCase
             'total_amount' => 199.90,
             'items' => [
                 [
-                    'product_id' => 104,  // 库存只有10个
-                    'quantity' => 20,     // 订购20个，超出库存
+                    'product_id' => 104,  // 库存只有60个
+                    'quantity' => 61,     // 订购61个，超出库存
                     'price' => 9.99
                 ]
             ]
